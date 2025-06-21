@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ajith Rajendran - Civil Engineer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Main styles -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Admin styles -->
+    <link rel="stylesheet" href="admin-styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="#" class="logo">AS</a>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#experience">Projects</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header>
+        <div class="profile-container">
+            <img src="Images/Ajith.jpg" alt="Ajith R" class="profile-photo">
+            <div class="profile-text">
+                <h1>Ajith Rajendran</h1>
+                <p class="title"><h2>Engineer - Quantity Surveying, Planning & BBS</h2></p>
+                <p class="caption"><h2>"Building tomorrow's infrastructure with innovation and precision"</h2></p>
+            </div>
+        </div>
+    </header>
+
+    <section id="about">
+        <div class="container">
+            <div class="card">
+                <h3><i class="fas fa-user" style="color: #08488d;"></i> About Me</h3>
+                <p>Passionate Civil Engineer with expertise in structural design and modern development technologies. To work in a progressive organization where I can enhance my skills and learning to the 
+                    success of the organization. To creativity that provides exposure to innovative ideas, 
+                    stimulates personal and professional growth.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience">
+        <div class="container">
+            <div class="card">
+                <h3><i class="fas fa-briefcase"></i> Professional Experience & Projects</h3>
+                
+                <!-- Admin Controls (show only in admin mode) -->
+                <div id="adminControls" style="display: none;">
+                    <button onclick="showAddProjectForm()" class="btn-primary">
+                        <i class="fas fa-plus"></i> Add New Project
+                    </button>
+                    <button onclick="toggleAdminMode()" class="btn-secondary">
+                        <i class="fas fa-eye-slash"></i> Exit Admin Mode
+                    </button>
+                </div>
+                
+                <div class="experience-item">
+                    <h4>Senior Engineer-QS, Planning & Site Engineer</h4>
+                    <p class="company">UMIYA GROUP, Bangalore.</p>
+                    <p class="duration">Oct 2023-Till now</p>
+                    
+                    <div class="projects-section">
+                        <h4><i class="fas fa-building" style="color: #08488d;"></i> Current Projects:</h4>
+                        <div id="loadingProjects" class="loading-spinner" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i> Loading projects...
+                        </div>
+                        <ul class="projects" id="currentProjectsList">
+                            <!-- Current projects will be loaded dynamically -->
+                        </ul>
+                    </div>
+
+                    <div class="responsibilities-section">
+                        <h4><i class="fas fa-tasks" style="color: #08488d;"></i> Roles & Responsibilities</h4>
+                        <ul class="responsibilities">
+                            <li>Experience in Residential & Commercial project – Structures, Finishing, Interior works, Billing, Estimating, Planning, Auto CAD plans, etc.</li>
+                            <li>Get appropriate Drawings and Prepare Bar Bending Schedule as per the allotted Work Schedule on Construction Project.</li>
+                            <li>G+13 building Estimating quantities, costs and time scales for material and labour.</li>
+                            <li>Preparing and submitting the progress reports to the management.</li>
+                            <li>Taking care of daily progress work & comparing the quantities planned to be executed</li>
+                            <li>Discussion with Architectures & structural engineers related to projects</li>
+                            <li>Preparation of Weekly and monthly reports & schedule</li>
+                            <li>Supervising day to day on-site construction activities to meet the deadline, cost and quality</li>
+                            <li>Supporting Site team in Material and vendor Procurement</li>
+                            <li>Coordinating and monitoring the work both contractors and suppliers</li>
+                            <li>Liaising with clients to identify their needs.</li>
+                            <li>Assure quality standards are met and report any deviations from the standards</li>
+                            <li>Preparing Bill of quantities for high rise building.</li>
+                            <li>Prepared technical documentation and reports</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="experience-item">
+                    <h4>BBS Engineer & Quantity Surveyor</h4>
+                    <p class="company">TABUK STEEL COMPANY (Neom) Kingdom of Saudi Arabia (Tabuk)</p>
+                    <p class="duration">Nov 2021-Sep 2023</p>
+                    
+                    <div class="projects-section">
+                        <h4><i class="fas fa-building" style="color: #08488d;"></i> Saudi Arabia Projects:</h4>
+                        <ul class="projects" id="saudiProjectsList">
+                            <!-- Saudi projects will be loaded dynamically -->
+                        </ul>
+                    </div>
+
+                    <div class="responsibilities-section">
+                        <h4><i class="fas fa-tasks" style="color: #08488d;"></i> Roles and Responsibilities</h4>
+                        <ul class="responsibilities">
+                            <li>Preparing Bar Bending Schedule for Residential & Commercial Buildings.</li>
+                            <li>Preparing detailed quantity take-offs and cost estimates for construction projects.</li>
+                            <li>Analyzing construction drawings and specifications to extract accurate measurements.</li>
+                            <li>Coordinating with structural engineers for design clarifications and modifications.</li>
+                            <li>Managing material procurement and inventory control for reinforcement steel.</li>
+                            <li>Preparing progress reports and maintaining documentation of completed work.</li>
+                            <li>Ensuring compliance with local building codes and safety regulations.</li>
+                            <li>Optimizing steel usage to minimize waste and reduce costs.</li>
+                            <li>Conducting site visits to verify measurements and resolve technical issues.</li>
+                            <li>Collaborating with construction teams to ensure accurate implementation of BBS.</li>
+                            <li>Monitoring project progress and providing regular updates to stakeholders.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="experience-item">
+                    <h4>Site Engineer & Quantity Surveyor</h4>
+                    <p class="company">KSR Engineering Construction Pvt. Ramnad</p>
+                    <p class="duration">June 2020-Oct 2021</p>
+                    
+                    <div class="projects-section">
+                        <h4><i class="fas fa-building" style="color: #08488d;"></i> Government Projects:</h4>
+                        <ul class="projects" id="governmentProjectsList">
+                            <!-- Government projects will be loaded dynamically -->
+                        </ul>
+                    </div>
+
+                    <div class="responsibilities-section">
+                        <h4><i class="fas fa-tasks" style="color: #08488d;"></i> Roles and Responsibilities</h4>
+                        <ul class="responsibilities">
+                            <li>Managed construction of Government Medical College boys and girls hostels (G+9 Building) and Government Hospital (G+5)</li>
+                            <li>Supervised daily construction activities and ensured quality control</li>
+                            <li>Prepared quantity surveys and cost estimates for large-scale government projects</li>
+                            <li>Coordinated with contractors and suppliers for material procurement</li>
+                            <li>Monitored project progress and prepared regular status reports</li>
+                            <li>Ensured compliance with government construction standards and specifications</li>
+                            <li>Reviewed and verified construction drawings and technical documentation</li>
+                            <li>Managed site safety and implemented safety protocols</li>
+                            <li>Coordinated with multiple stakeholders including government officials</li>
+                            <li>Conducted quality inspections and maintained quality assurance records</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- All Projects Section -->
+                <div class="all-projects-section">
+                    <h3><i class="fas fa-folder-open" style="color: #08488d;"></i> All Projects Portfolio</h3>
+                    <div class="projects-filter">
+                        <button onclick="filterProjects('all')" class="filter-btn active" data-filter="all">
+                            <i class="fas fa-th"></i> All Projects
+                        </button>
+                        <button onclick="filterProjects('ongoing')" class="filter-btn" data-filter="ongoing">
+                            <i class="fas fa-play"></i> Ongoing
+                        </button>
+                        <button onclick="filterProjects('completed')" class="filter-btn" data-filter="completed">
+                            <i class="fas fa-check"></i> Completed
+                        </button>
+                        <button onclick="filterProjects('commercial')" class="filter-btn" data-filter="commercial">
+                            <i class="fas fa-building"></i> Commercial
+                        </button>
+                        <button onclick="filterProjects('residential')" class="filter-btn" data-filter="residential">
+                            <i class="fas fa-home"></i> Residential
+                        </button>
+                    </div>
+                    
+                    <div class="search-section">
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="projectSearch" placeholder="Search projects by name, company, location..." 
+                                   onkeyup="handleSearch(this.value)" class="search-input">
+                            <button onclick="clearSearch()" class="clear-search" id="clearSearchBtn" style="display: none;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="projects-grid" id="allProjectsGrid">
+                        <!-- All projects will be displayed here in grid format -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Add Project Modal -->
+    <div id="projectModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeProjectModal()">&times;</span>
+            <h3 id="modalTitle">Add New Project</h3>
+            <form id="projectForm" enctype="multipart/form-data">
+                <input type="hidden" id="projectId" name="projectId">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="title">Project Title: <span class="required">*</span></label>
+                        <input type="text" id="title" name="title" required placeholder="Enter project title">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="company">Company: <span class="required">*</span></label>
+                        <select id="company" name="company" required>
+                            <option value="">Select Company</option>
+                            <option value="UMIYA GROUP">UMIYA GROUP</option>
+                            <option value="TABUK STEEL COMPANY">TABUK STEEL COMPANY</option>
+                            <option value="KSR Engineering Construction Pvt">KSR Engineering Construction Pvt</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="location">Location: <span class="required">*</span></label>
+                        <input type="text" id="location" name="location" required placeholder="City, State/Country">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="value">Project Value: <span class="required">*</span></label>
+                        <input type="text" id="value" name="value" required placeholder="₹170 Cr">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="type">Project Type: <span class="required">*</span></label>
+                        <select id="type" name="type" required>
+                            <option value="">Select Type</option>
+                            <option value="Commercial Building">Commercial Building</option>
+                            <option value="Luxury Villas">Luxury Villas</option>
+                            <option value="Apartment">Apartment</option>
+                            <option value="Hospital">Hospital</option>
+                            <option value="Hostel">Hostel</option>
+                            <option value="Residential Complex">Residential Complex</option>
+                            <option value="Industrial">Industrial</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="status">Status: <span class="required">*</span></label>
+                        <select id="status" name="status" required>
+                            <option value="ongoing">Ongoing</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description: <span class="required">*</span></label>
+                    <textarea id="description" name="description" rows="4" required placeholder="Brief description of the project..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="image">Project Image:</label>
+                    <input type="file" id="image" name="image" accept="image/*">
+                    <small>Recommended size: 800x600px or higher</small>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Save Project
+                    </button>
+                    <button type="button" onclick="closeProjectModal()" class="btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Project Details Modal -->
+    <div id="projectDetailsModal" class="modal" style="display: none;">
+        <div class="modal-content project-details">
+            <span class="close" onclick="closeProjectDetailsModal()">&times;</span>
+            <div id="projectDetailsContent">
+                <!-- Project details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Modal (for viewing project images) -->
+    <div id="imageModal" class="modal" style="display: none;">
+        <div class="modal-content image-modal">
+            <span class="close" onclick="closeImageModal()">&times;</span>
+            <img id="modalImage" src="" alt="" style="width: 100%; max-width: 800px;">
+            <p id="modalCaption"></p>
+        </div>
+    </div>
+
+    <section id="skills">
+        <div class="container">
+            <div class="card">
+                <h3><i class="fas fa-code" style="color: #08488d;"></i> Technical Skills</h3>
+                <div class="skills-list">
+                    <div class="skill"><i class="fas fa-drafting-compass"></i>Auto CAD</div>
+                    <div class="skill"><i class="fas fa-building"></i> Revit Architecture</div>
+                    <div class="skill"><i class="fas fa-ruler-combined"></i> ASA for BBS</div>
+                    <div class="skill"><i class="fas fa-cube"></i> SketchUp</div>
+                    <div class="skill"><i class="fas fa-chart-line"></i> Staad Pro Analysis</div>
+                    <div class="skill"><i class="fas fa-file-word"></i> Microsoft Office</div>
+                    <div class="skill"><i class="fas fa-image"></i> Photoshop</div>
+                </div>
+            </div>
+            <div class="card">
+                <h3><i class="fas fa-briefcase"></i> Professional Skills</h3>
+                <ul>
+                    <li><i class="fas fa-tasks" style="color: #08488d"></i> Project Management</li>
+                    <li><i class="fas fa-users" style="color: #08488d"></i> Team Leadership</li>
+                    <li><i class="fas fa-chart-bar" style="color: #08488d"></i> Structural Analysis</li>
+                    <li><i class="fas fa-calendar-alt" style="color: #08488d"></i> Construction Planning</li>
+                    <li><i class="fas fa-file-alt" style="color: #08488d"></i> Technical Documentation</li>
+                    <li><i class="fas fa-sync" style="color: #08488d"></i> Site Co-ordination</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="education">
+        <div class="container">
+            <div class="card">
+                <h3><i class="fas fa-graduation-cap" style="color: #08488d;"></i> Education</h3>
+                
+                <div class="education-item">
+                    <h4>Bachelor of Engineering in Civil Engineering</h4>
+                    <p class="institution">Anna University, Tamil Nadu</p>
+                    <p class="duration">2016 - 2020</p>
+                    <p class="grade"><i class="fas fa-star" style="color: #08488d;"></i> CGPA: 8.3/10</p>
+                </div>
+                <div class="education-item">
+                    <h4>Higher Secondary School (HSC)</h4>        
+                    <p class="institution">Tamil Nadu State Board</p>
+                    <p class="duration">2015 - 2016</p>
+                    <p class="grade"><i class="fas fa-award" style="color: #08488d;"></i> First Class</p>
+                </div>
+            </div>
+        </div>
+    </section>    
+
+    <section id="languages">
+        <div class="container">
+            <div class="card">
+                <h3><i class="fas fa-language"></i> Languages</h3>
+                <div class="language-grid">
+                    <div class="language-item">
+                        <h4>English</h4>
+                        <div class="proficiency-bar">
+                            <div class="proficiency" style="width: 90%"></div>
+                        </div>
+                        <span>Native</span>
+                    </div>
+                    
+                    <div class="language-item">
+                        <h4>Tamil</h4>
+                        <div class="proficiency-bar">
+                            <div class="proficiency" style="width: 100%"></div>
+                        </div>
+                        <span>Native</span>
+                    </div>
+
+                    <div class="language-item">
+                        <h4>Hindi</h4>
+                        <div class="proficiency-bar">
+                            <div class="proficiency" style="width: 80%"></div>
+                        </div>
+                        <span>Professional</span>
+                    </div>
+
+                    <div class="language-item">
+                        <h4>Arabic</h4>
+                        <div class="proficiency-bar">
+                            <div class="proficiency" style="width: 70%"></div>
+                        </div>
+                        <span>Intermediate</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="container">
+            <div class="card">
+                <h3><i class="fas fa-handshake"></i> Let's Connect</h3>
+                <div class="social-links">
+                    <p><i class="fas fa-phone" style="color: #4CAF50"></i> Phone: <a href="tel:+917826852507">+91 7826852507</a></p>
+                    <p><i class="fas fa-envelope" style="color: #2196F3"></i> Email: <a href="mailto:ajithsukirtha@gmail.com">ajithsukirtha@gmail.com</a></p>
+                    <p><i class="fab fa-linkedin" style="color: #0077B5"></i> LinkedIn: <a href="https://www.linkedin.com/in/ajith18-rajendran/" target="_blank" rel="noopener">LinkedIn Profile</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Ajith R | Civil Engineer</p>
+            <div class="social-icons">
+                <a href="https://wa.me/917826852507" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://www.linkedin.com/in/ajith18-rajendran/" target="_blank"><i class="fab fa-linkedin"></i></a>
+                <a href="mailto:ajithsukirtha@gmail.com"><i class="fas fa-envelope"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="projects.js"></script>
+    <script>
+        // Smooth scroll behavior for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Admin mode toggle
+        function toggleAdminMode() {
+            isAdminMode = false;
+            document.getElementById('adminControls').style.display = 'none';
+            // Update URL to remove admin parameter
+            const url = new URL(window.location);
+            url.searchParams.delete('admin');
+            window.history.replaceState({}, document.title, url);
+            displayProjects(); // Refresh to hide admin buttons
+        }
+
+        // Check for admin access on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const adminParam = urlParams.get('admin');
+            const adminPassword = urlParams.get('password');
+            
+            // Simple password protection for admin mode
+            if (adminParam === 'true' && adminPassword === 'ajith2025') {
+                enableAdminMode();
+            } else if (adminParam === 'true') {
+                const password = prompt('Enter admin password:');
+                if (password === 'ajith2025') {
+                    enableAdminMode();
+                    // Update URL with password
+                    const url = new URL(window.location);
+                    url.searchParams.set('password', 'ajith2025');
+                    window.history.replaceState({}, document.title, url);
+                } else {
+                    alert('Invalid password');
+                    // Remove admin parameter from URL
+                    const url = new URL(window.location);
+                    url.searchParams.delete('admin');
+                    window.history.replaceState({}, document.title, url);
+                }
+            }
+        });
+
+        // Keyboard shortcuts for admin
+        document.addEventListener('keydown', function(e) {
+            // Ctrl + Alt + A to toggle admin mode
+            if (e.ctrlKey && e.altKey && e.key === 'a') {
+                e.preventDefault();
+                const password = prompt('Enter admin password:');
+                if (password === 'ajith2025') {
+                    if (!isAdminMode) {
+                        enableAdminMode();
+                        // Update URL
+                        const url = new URL(window.location);
+                        url.searchParams.set('admin', 'true');
+                        url.searchParams.set('password', 'ajith2025');
+                        window.history.replaceState({}, document.title, url);
+                    } else {
+                        toggleAdminMode();
+                    }
+                }
+            }
+        });
+
+        // Add loading animation
+        function showLoading() {
+            document.getElementById('loadingProjects').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingProjects').style.display = 'none';
+        }
+
+        // Error handling for failed requests
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" class="close-error">×</button>
+            `;
+            document.body.appendChild(errorDiv);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (errorDiv.parentElement) {
+                    errorDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Success message
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" class="close-success">×</button>
+            `;
+            document.body.appendChild(successDiv);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                if (successDiv.parentElement) {
+                    successDiv.remove();
+                }
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
