@@ -190,7 +190,7 @@ body {
 
 /* Header */
 header {
-    background-image: url('Profile.jpg');
+    background-image: url('Images/Profile.jpg');
     background-size: cover;
     background-size: cover;
  
@@ -643,7 +643,7 @@ footer {
 }
 /* Add these section-specific backgrounds */
 #about,#header {
-    background-image: url('civil.jpg');
+    background-image: url('Images/civil.jpg');
     background-attachment: fixed;
     background-size: cover;
     position: relative;
@@ -660,7 +660,7 @@ footer {
     z-index: -1;
 }
 #experience,#skills,#projects,#contact,#education,#languages {
-    background-image: url('civil.jpg');
+    background-image: url('Images/civil.jpg');
     background-attachment: fixed;
     background-size: cover;
     position: relative;
