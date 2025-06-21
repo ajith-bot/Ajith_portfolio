@@ -6,32 +6,89 @@ let currentFilter = 'all';
 // Load projects on page load
 document.addEventListener('DOMContentLoaded', function() {
     loadProjects();
+    
+    // Check for admin mode from localStorage
+    if (localStorage.getItem('adminMode') === 'true') {
+        enableAdminMode();
+    }
 });
 
 // Load projects from API
 async function loadProjects() {
-    showLoading();
+    console.log('🔄 Loading projects from API...');
+    
     try {
-        const response = await fetch('/api/projects');
+        const response = await fetch('/api/projects', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        
+        console.log('📡 API Response Status:', response.status);
+        
         if (!response.ok) {
-            throw new Error('Failed to load projects');
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        projects = await response.json();
-        displayProjects();
-        displayProjectsByCompany();
-        hideLoading();
+        
+        // Get the response text first to debug
+        const responseText = await response.text();
+        console.log('📡 Raw API Response:', responseText);
+        
+        // Parse JSON
+        let projects;
+        try {
+            projects = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error('❌ JSON Parse Error:', parseError);
+            throw new Error('Invalid JSON response from server');
+        }
+        
+        console.log('✅ Parsed projects:', projects);
+        
+        // Handle different response formats
+        let projectsArray;
+        if (Array.isArray(projects)) {
+            projectsArray = projects;
+        } else if (projects && projects.data && Array.isArray(projects.data)) {
+            projectsArray = projects.data;
+        } else if (projects && projects.projects && Array.isArray(projects.projects)) {
+            projectsArray = projects.projects;
+        } else if (projects && typeof projects === 'object') {
+            // If it's a single project object, wrap in array
+            projectsArray = [projects];
+        } else {
+            console.error('❌ Unexpected response format:', projects);
+            projectsArray = [];
+        }
+        
+        console.log('📊 Final projects array:', projectsArray);
+        console.log('📊 Number of projects:', projectsArray.length);
+        
+        // Store globally
+        window.projects = projectsArray;
+        window.allProjects = projectsArray;
+        
+        // Display projects in both formats
+        displayProjectsByCompany(projectsArray);
+        displayAllProjectsGrid(projectsArray);
+        
+        return projectsArray;
+        
     } catch (error) {
-        console.error('Error loading projects:', error);
-        showError('Failed to load projects. Please try again later.');
-        hideLoading();
+        console.error('❌ Failed to load projects:', error);
+        showErrorMessage(error.message);
+        return [];
     }
 }
 
-// Display projects in different sections
-function displayProjectsByCompany() {
-    const currentProjects = projects.filter(p => p.company === 'UMIYA GROUP');
-    const saudiProjects = projects.filter(p => p.company === 'TABUK STEEL COMPANY');
-    const governmentProjects = projects.filter(p => p.company === 'KSR Engineering Construction Pvt');
+// Display projects by company in their respective sections
+function displayProjectsByCompany(projectsArray = window.projects || []) {
+    console.log('🏢 Displaying projects by company:', projectsArray);
+    
+    const currentProjects = projectsArray.filter(p => p.company === 'UMIYA GROUP');
+    const saudiProjects = projectsArray.filter(p => p.company === 'TABUK STEEL COMPANY');
+    const governmentProjects = projectsArray.filter(p => p.company === 'KSR Engineering Construction Pvt');
     
     displayProjectList('currentProjectsList', currentProjects);
     displayProjectList('saudiProjectsList', saudiProjects);
@@ -41,7 +98,10 @@ function displayProjectsByCompany() {
 // Display project list for specific company
 function displayProjectList(containerId, projectList) {
     const container = document.getElementById(containerId);
-    if (!container) return;
+    if (!container) {
+        console.warn(`Container ${containerId} not found`);
+        return;
+    }
     
     if (projectList.length === 0) {
         container.innerHTML = '<li class="empty-state-small">No projects available</li>';
@@ -52,57 +112,73 @@ function displayProjectList(containerId, projectList) {
     projectList.forEach(project => {
         const projectItem = document.createElement('li');
         projectItem.innerHTML = `
-            ✓ <a href="#" class="project-link" onclick="openProjectDetails('${project._id}')">
-                <img src="${project.image || '/Images/default-project.jpg'}" alt="${project.title}" class="project-thumbnail">
-                ${project.title} (${project.location}) - ${project.value} ${project.type}
-            </a>
-            ${isAdminMode ? `
-                <div class="admin-buttons">
-                    <button onclick="editProject('${project._id}')" class="btn-edit" title="Edit Project">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="deleteProject('${project._id}')" class="btn-delete" title="Delete Project">
-                        <i class="fas fa-trash"></i>
-                    </button>
+            <div style="display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee;">
+                ${project.image ? `<img src="${project.image}" alt="${project.title}" class="project-thumbnail" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px;">` : ''}
+                <div style="flex: 1;">
+                    <strong style="color: #08488d; cursor: pointer;" onclick="openProjectDetails('${project._id}')">
+                        ${project.title}
+                    </strong>
+                    <br>
+                    <small style="color: #666;">
+                        📍 ${project.location} • 💰 ${project.value} • 🏗️ ${project.type}
+                        <span class="status-badge status-${project.status}" style="margin-left: 8px; padding: 2px 6px; border-radius: 3px; font-size: 10px; text-transform: uppercase;">
+                            ${project.status}
+                        </span>
+                    </small>
                 </div>
-            ` : ''}
+                ${isAdminMode ? `
+                    <div class="admin-buttons" style="margin-left: 10px;">
+                        <button onclick="editProject('${project._id}')" class="btn-edit" title="Edit Project" style="margin-right: 5px;">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteProject('${project._id}')" class="btn-delete" title="Delete Project">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                ` : ''}
+            </div>
         `;
         container.appendChild(projectItem);
     });
 }
 
 // Display all projects in grid format
-function displayProjects() {
+function displayAllProjectsGrid(projectsArray = window.projects || []) {
+    console.log('🎨 Displaying all projects in grid:', projectsArray);
+    
     const projectsGrid = document.getElementById('allProjectsGrid');
-    if (!projectsGrid) return;
+    if (!projectsGrid) {
+        console.error('❌ All projects grid container not found');
+        return;
+    }
     
-    let filteredProjects = projects;
-    
-    // Apply filters
+    // Apply current filter
+    let filteredProjects = projectsArray;
     if (currentFilter !== 'all') {
-        filteredProjects = projects.filter(project => {
+        filteredProjects = projectsArray.filter(project => {
             switch (currentFilter) {
                 case 'ongoing':
                     return project.status === 'ongoing';
                 case 'completed':
                     return project.status === 'completed';
                 case 'commercial':
-                    return project.type.toLowerCase().includes('commercial') || 
-                           project.type.toLowerCase().includes('building');
+                    return project.type && project.type.toLowerCase().includes('commercial');
                 case 'residential':
-                    return project.type.toLowerCase().includes('villa') || 
-                           project.type.toLowerCase().includes('apartment') || 
-                           project.type.toLowerCase().includes('residential');
+                    return project.type && project.type.toLowerCase().includes('residential');
                 default:
                     return true;
             }
         });
     }
     
+    // Clear existing content
+    projectsGrid.innerHTML = '';
+    
+    // Handle empty projects
     if (filteredProjects.length === 0) {
         projectsGrid.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-folder-open"></i>
+            <div class="empty-state" style="text-align: center; padding: 40px; color: #666;">
+                <i class="fas fa-folder-open" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
                 <h4>No projects found</h4>
                 <p>No projects match the current filter criteria.</p>
             </div>
@@ -110,50 +186,75 @@ function displayProjects() {
         return;
     }
     
-    projectsGrid.innerHTML = '';
+    // Generate project cards
     filteredProjects.forEach((project, index) => {
-        const projectCard = document.createElement('div');
-        projectCard.className = 'project-card';
-        projectCard.style.animationDelay = `${index * 0.1}s`;
-        projectCard.onclick = () => openProjectDetails(project._id);
-        
-        projectCard.innerHTML = `
-            <div class="project-status-badge status-${project.status}">
-                ${project.status}
-            </div>
-            <img src="${project.image || '/Images/default-project.jpg'}" 
-                 alt="${project.title}" 
-                 class="project-card-image"
-                 onerror="this.src='/Images/default-project.jpg'">
-            <div class="project-card-content">
-                <h4 class="project-card-title">${project.title}</h4>
-                <p class="project-card-details">
-                    <i class="fas fa-map-marker-alt"></i> ${project.location} | 
-                    <i class="fas fa-building"></i> ${project.company}
-                </p>
-                <p class="project-card-value">
-                    <i class="fas fa-rupee-sign"></i> ${project.value}
-                </p>
-                <span class="project-card-status status-${project.status}">
-                    <i class="fas fa-${project.status === 'ongoing' ? 'play' : 'check'}"></i>
-                    ${project.status}
-                </span>
-                ${isAdminMode ? `
-                    <div class="project-card-admin">
-                        <button onclick="event.stopPropagation(); editProject('${project._id}')" 
-                                class="btn-edit" title="Edit Project">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="event.stopPropagation(); deleteProject('${project._id}')" 
-                                class="btn-delete" title="Delete Project">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                ` : ''}
-            </div>
-        `;
+        const projectCard = createProjectCard(project, index);
         projectsGrid.appendChild(projectCard);
     });
+    
+    console.log(`✅ Displayed ${filteredProjects.length} projects in grid`);
+}
+
+// Create project card element
+function createProjectCard(project, index) {
+    const card = document.createElement('div');
+    card.className = 'project-card';
+    card.style.animationDelay = `${index * 0.1}s`;
+    card.setAttribute('data-project-id', project._id || '');
+    
+    // Safe property access with defaults
+    const title = project.title || 'Untitled Project';
+    const location = project.location || 'Location not specified';
+    const value = project.value || 'Value not specified';
+    const company = project.company || 'Company not specified';
+    const type = project.type || 'Type not specified';
+    const status = project.status || 'ongoing';
+    const description = project.description || 'No description available';
+    const image = project.image || '/Images/default-project.jpg';
+    
+    card.innerHTML = `
+        <div class="project-status-badge status-${status}">
+            ${status.toUpperCase()}
+        </div>
+        <img src="${image}" 
+             alt="${title}" 
+             class="project-card-image"
+             onerror="this.src='/Images/default-project.jpg'"
+             onclick="openProjectDetails('${project._id}')">
+        <div class="project-card-content">
+            <h4 class="project-card-title" onclick="openProjectDetails('${project._id}')">${title}</h4>
+            <p class="project-card-details">
+                <i class="fas fa-map-marker-alt"></i> ${location}
+            </p>
+            <p class="project-card-company">
+                <i class="fas fa-building"></i> ${company}
+            </p>
+            <p class="project-card-value">
+                <i class="fas fa-rupee-sign"></i> ${value}
+            </p>
+            <p class="project-card-type">
+                <i class="fas fa-tag"></i> ${type}
+            </p>
+            <div class="project-card-status status-${status}">
+                <i class="fas fa-${status === 'ongoing' ? 'play' : 'check'}"></i>
+                ${status.charAt(0).toUpperCase() + status.slice(1)}
+            </div>
+            ${isAdminMode ? `
+                <div class="project-card-admin">
+                    <button onclick="event.stopPropagation(); editProject('${project._id}')" 
+                            class="btn-edit" title="Edit Project">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="event.stopPropagation(); deleteProject('${project._id}')" 
+                            class="btn-delete" title="Delete Project">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            ` : ''}
+        </div>
+    `;
+    
+    return card;
 }
 
 // Filter projects
@@ -164,18 +265,98 @@ function filterProjects(filter) {
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+    const activeBtn = document.querySelector(`[data-filter="${filter}"]`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
     
-    displayProjects();
+    // Re-display projects with new filter
+    displayAllProjectsGrid();
+}
+
+// Search functionality
+function handleSearch(searchTerm) {
+    const clearBtn = document.getElementById('clearSearchBtn');
+    if (searchTerm.trim()) {
+        clearBtn.style.display = 'block';
+        searchProjects(searchTerm);
+    } else {
+        clearBtn.style.display = 'none';
+        displayAllProjectsGrid(); // Show all projects when search is empty
+    }
+}
+
+function clearSearch() {
+    document.getElementById('projectSearch').value = '';
+    document.getElementById('clearSearchBtn').style.display = 'none';
+    displayAllProjectsGrid();
+}
+
+function searchProjects(searchTerm) {
+    const projectsArray = window.projects || [];
+    const filteredProjects = projectsArray.filter(project => 
+        project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    
+    displayFilteredProjects(filteredProjects);
+}
+
+function displayFilteredProjects(filteredProjects) {
+    const projectsGrid = document.getElementById('allProjectsGrid');
+    if (!projectsGrid) return;
+    
+    projectsGrid.innerHTML = '';
+    
+    if (filteredProjects.length === 0) {
+        projectsGrid.innerHTML = `
+            <div class="empty-state" style="text-align: center; padding: 40px; color: #666;">
+                <i class="fas fa-search" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                <h4>No projects found</h4>
+                <p>Try adjusting your search terms.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    filteredProjects.forEach((project, index) => {
+        const projectCard = createProjectCard(project, index);
+        projectsGrid.appendChild(projectCard);
+    });
 }
 
 // Enable admin mode
 function enableAdminMode() {
     isAdminMode = true;
-    document.getElementById('adminControls').style.display = 'block';
-    displayProjects();
+    window.isAdminMode = true;
+    const adminControls = document.getElementById('adminControls');
+    if (adminControls) {
+        adminControls.style.display = 'block';
+    }
+    
+    // Refresh displays to show admin buttons
     displayProjectsByCompany();
+    displayAllProjectsGrid();
     showSuccess('Admin mode enabled');
+}
+
+// Disable admin mode
+function toggleAdminMode() {
+    isAdminMode = false;
+    window.isAdminMode = false;
+    localStorage.removeItem('adminMode');
+    const adminControls = document.getElementById('adminControls');
+    if (adminControls) {
+        adminControls.style.display = 'none';
+    }
+    
+    // Refresh displays to hide admin buttons
+    displayProjectsByCompany();
+    displayAllProjectsGrid();
+    showSuccess('Admin mode disabled');
 }
 
 // Show add project form
@@ -197,13 +378,13 @@ async function editProject(projectId) {
         
         document.getElementById('modalTitle').textContent = 'Edit Project';
         document.getElementById('projectId').value = project._id;
-        document.getElementById('title').value = project.title;
-        document.getElementById('company').value = project.company;
-        document.getElementById('location').value = project.location;
-        document.getElementById('value').value = project.value;
-        document.getElementById('type').value = project.type;
-        document.getElementById('description').value = project.description;
-        document.getElementById('status').value = project.status;
+        document.getElementById('title').value = project.title || '';
+        document.getElementById('company').value = project.company || '';
+        document.getElementById('location').value = project.location || '';
+        document.getElementById('value').value = project.value || '';
+        document.getElementById('type').value = project.type || '';
+        document.getElementById('description').value = project.description || '';
+        document.getElementById('status').value = project.status || 'ongoing';
         
         document.getElementById('projectModal').style.display = 'block';
     } catch (error) {
@@ -214,7 +395,8 @@ async function editProject(projectId) {
 
 // Delete project
 async function deleteProject(projectId) {
-    const project = projects.find(p => p._id === projectId);
+    const projectsArray = window.projects || [];
+    const project = projectsArray.find(p => p._id === projectId);
     const projectName = project ? project.title : 'this project';
     
     if (!confirm(`Are you sure you want to delete "${projectName}"? This action cannot be undone.`)) {
@@ -403,10 +585,32 @@ function hideLoading() {
 function showError(message) {
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error-message';
+    errorDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #f44336;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        z-index: 10000;
+        max-width: 400px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    `;
     errorDiv.innerHTML = `
         <i class="fas fa-exclamation-triangle"></i>
         <span>${message}</span>
-        <button onclick="this.parentElement.remove()" class="close-error">×</button>
+        <button onclick="this.parentElement.remove()" class="close-error" style="
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: auto;
+        ">×</button>
     `;
     document.body.appendChild(errorDiv);
     
@@ -421,10 +625,32 @@ function showError(message) {
 function showSuccess(message) {
     const successDiv = document.createElement('div');
     successDiv.className = 'success-message';
+    successDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4CAF50;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        z-index: 10000;
+        max-width: 400px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    `;
     successDiv.innerHTML = `
         <i class="fas fa-check-circle"></i>
         <span>${message}</span>
-        <button onclick="this.parentElement.remove()" class="close-success">×</button>
+        <button onclick="this.parentElement.remove()" class="close-success" style="
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: auto;
+        ">×</button>
     `;
     document.body.appendChild(successDiv);
     
@@ -452,77 +678,91 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Search functionality
-function searchProjects(searchTerm) {
-    const filteredProjects = projects.filter(project => 
-        project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.type.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+// Add comprehensive error handling
+function showErrorMessage(message) {
+    console.error('🚨 Showing error message:', message);
     
-    displayFilteredProjects(filteredProjects);
+    // Show error in company sections
+    const containers = ['currentProjectsList', 'saudiProjectsList', 'governmentProjectsList'];
+    containers.forEach(containerId => {
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.innerHTML = `
+                <li style="background: #ffebee; color: #c62828; padding: 15px; border-radius: 5px; list-style: none; margin: 10px 0;">
+                    <strong>⚠️ Error Loading Projects</strong><br>
+                    <code>${message}</code><br>
+                    <div style="margin-top: 10px;">
+                        <button onclick="loadProjects()" style="background: #08488d; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-right: 10px;">🔄 Retry</button>
+                        <button onclick="debugAPI()" style="background: #4CAF50; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">🔍 Debug</button>
+                    </div>
+                </li>
+            `;
+        }
+    });
+    
+    // Show error in grid view
+    const projectsGrid = document.getElementById('allProjectsGrid');
+    if (projectsGrid) {
+        projectsGrid.innerHTML = `
+            <div class="empty-state" style="text-align: center; padding: 40px; color: #c62828; background: #ffebee; border-radius: 8px;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px;"></i>
+                <h4>Error Loading Projects</h4>
+                <p><code>${message}</code></p>
+                <div style="margin-top: 20px;">
+                    <button onclick="loadProjects()" style="background: #08488d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-right: 10px;">
+                        <i class="fas fa-redo"></i> Retry Loading
+                    </button>
+                    <button onclick="debugAPI()" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                        <i class="fas fa-bug"></i> Debug API
+                    </button>
+                </div>
+            </div>
+        `;
+    }
 }
 
-function displayFilteredProjects(filteredProjects) {
-    const projectsGrid = document.getElementById('allProjectsGrid');
-    if (!projectsGrid) return;
+// Debug function
+async function debugAPI() {
+    console.log('🔍 Starting API Debug...');
     
-    if (filteredProjects.length === 0) {
-        projectsGrid.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-search"></i>
-                <h4>No projects found</h4>
-                <p>Try adjusting your search terms.</p>
-            </div>
-        `;
-        return;
-    }
-    
-    projectsGrid.innerHTML = '';
-    filteredProjects.forEach((project, index) => {
-        const projectCard = document.createElement('div');
-        projectCard.className = 'project-card';
-        projectCard.style.animationDelay = `${index * 0.1}s`;
-        projectCard.onclick = () => openProjectDetails(project._id);
+    try {
+        // Test basic connectivity
+        console.log('1. Testing basic connectivity...');
+        const healthResponse = await fetch('/api/health');
+        console.log('Health check status:', healthResponse.status);
         
-        projectCard.innerHTML = `
-            <div class="project-status-badge status-${project.status}">
-                ${project.status}
-            </div>
-            <img src="${project.image || '/Images/default-project.jpg'}" 
-                 alt="${project.title}" 
-                 class="project-card-image"
-                 onerror="this.src='/Images/default-project.jpg'">
-            <div class="project-card-content">
-                <h4 class="project-card-title">${project.title}</h4>
-                <p class="project-card-details">
-                    <i class="fas fa-map-marker-alt"></i> ${project.location} | 
-                    <i class="fas fa-building"></i> ${project.company}
-                </p>
-                <p class="project-card-value">
-                    <i class="fas fa-rupee-sign"></i> ${project.value}
-                </p>
-                <span class="project-card-status status-${project.status}">
-                    <i class="fas fa-${project.status === 'ongoing' ? 'play' : 'check'}"></i>
-                    ${project.status}
-                </span>
-                ${isAdminMode ? `
-                    <div class="project-card-admin">
-                        <button onclick="event.stopPropagation(); editProject('${project._id}')" 
-                                class="btn-edit" title="Edit Project">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="event.stopPropagation(); deleteProject('${project._id}')" 
-                                class="btn-delete" title="Delete Project">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                ` : ''}
-            </div>
-        `;
-        projectsGrid.appendChild(projectCard);
-    });
+        // Test projects endpoint
+        console.log('2. Testing projects endpoint...');
+        const projectsResponse = await fetch('/api/projects');
+        console.log('Projects response status:', projectsResponse.status);
+        console.log('Projects response headers:', [...projectsResponse.headers.entries()]);
+        
+        // Get raw response
+        const rawText = await projectsResponse.text();
+        console.log('3. Raw response text:', rawText);
+        
+        // Try to parse
+        try {
+            const parsed = JSON.parse(rawText);
+            console.log('4. Parsed JSON:', parsed);
+            console.log('5. Type check:', typeof parsed, Array.isArray(parsed));
+            
+            if (Array.isArray(parsed)) {
+                console.log('✅ Response is array with', parsed.length, 'items');
+                parsed.forEach((item, index) => {
+                    console.log(`Project ${index + 1}:`, item);
+                });
+            } else {
+                console.log('⚠️ Response is not array:', parsed);
+            }
+            
+        } catch (parseError) {
+            console.error('❌ JSON parse failed:', parseError);
+        }
+        
+    } catch (error) {
+        console.error('❌ Debug failed:', error);
+    }
 }
 
 // Export functions for global access
@@ -536,3 +776,13 @@ window.closeProjectModal = closeProjectModal;
 window.closeProjectDetailsModal = closeProjectDetailsModal;
 window.closeImageModal = closeImageModal;
 window.searchProjects = searchProjects;
+window.handleSearch = handleSearch;
+window.clearSearch = clearSearch;
+window.loadProjects = loadProjects;
+window.displayProjects = displayAllProjectsGrid; // Alias for backward compatibility
+window.displayAllProjectsGrid = displayAllProjectsGrid;
+window.displayProjectsByCompany = displayProjectsByCompany;
+window.debugAPI = debugAPI;
+window.showErrorMessage = showErrorMessage;
+window.enableAdminMode = enableAdminMode;
+window.toggleAdminMode = toggleAdminMode;
